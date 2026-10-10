@@ -1,0 +1,11 @@
+services:
+  menu-manager:
+    build: .
+    container_name: menu-manager
+    restart: unless-stopped
+    ports:
+      - "3300:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data

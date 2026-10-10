@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的菜单 - 设计 Demo</title>
+<style>
+  :root {
+    --primary: #f59e0b;       /* amber-500 */
+    --primary-dark: #d97706;
+    --primary-content: #fffbeb;
+    --secondary: #fb923c;     /* orange-400 */
+    --base: #fffbf0;          /* 米黄底 */
+    --base-100: #ffffff;
+    --base-200: #fef3c7;
+    --neutral: #44403c;
+    --text: #292524;
+    --muted: #78716c;
+    --danger: #ef4444;
+    --radius: 14px;
+    --shadow: 0 2px 10px rgba(180, 120, 20, .12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; background: var(--base); color: var(--text); min-height: 100vh; }
+
+  /* ===== 导航栏 ===== */
+  .navbar { display: flex; align-items: center; gap: 24px; padding: 0 24px; height: 60px; background: linear-gradient(90deg, var(--primary), var(--secondary)); color: var(--primary-content); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 50; }
+  .brand { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .nav-tabs { display: flex; gap: 4px; margin-left: 16px; }
+  .nav-tab { padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 15px; transition: .15s; border: none; background: transparent; color: var(--primary-content); }
+  .nav-tab:hover { background: rgba(255,255,255,.18); }
+  .nav-tab.active { background: rgba(255,255,255,.28); font-weight: 600; }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; font-size: 14px; }
+
+  /* ===== 通用 ===== */
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; border: none; border-radius: 10px; padding: 9px 18px; font-size: 14px; cursor: pointer; transition: .15s; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-ghost { background: transparent; color: inherit; border: 1px solid rgba(255,255,255,.5); }
+  .btn-outline { background: var(--base-100); color: var(--primary-dark); border: 1px solid var(--primary); }
+  .btn-outline:hover { background: var(--base-200); }
+  .btn-sm { padding: 5px 12px; font-size: 13px; border-radius: 8px; }
+  .btn-danger { background: #fee2e2; color: var(--danger); }
+  .btn-danger:hover { background: var(--danger); color: #fff; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; background: var(--base-200); color: var(--primary-dark); font-weight: 500; }
+  .input, .select, .textarea { width: 100%; border: 1.5px solid #e7dcc3; border-radius: 10px; padding: 9px 12px; font-size: 14px; background: var(--base-100); outline: none; transition: .15s; }
+  .input:focus, .select:focus, .textarea:focus { border-color: var(--primary); }
+  .label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 5px; font-weight: 500; }
+
+  /* ===== 分类标签 ===== */
+  .cat-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+  .cat-pill { padding: 7px 18px; border-radius: 999px; background: var(--base-100); border: 1.5px solid #eadfc5; font-size: 14px; cursor: pointer; transition: .15s; }
+  .cat-pill:hover { border-color: var(--primary); }
+  .cat-pill.active { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+  .search { margin-left: auto; width: 220px; }
+
+  /* ===== 菜品卡片 ===== */
+  .dish-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; }
+  .dish-card { background: var(--base-100); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); cursor: pointer; transition: .18s; border: 1px solid transparent; }
+  .dish-card:hover { transform: translateY(-4px); box-shadow: 0 8px 22px rgba(180,120,20,.2); border-color: #f6d98a; }
+  .dish-img { height: 130px; display: flex; align-items: center; justify-content: center; font-size: 56px; background: linear-gradient(135deg, #fde68a, #fdba74); }
+  .dish-body { padding: 14px 16px 16px; }
+  .dish-name { font-size: 16px; font-weight: 600; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+  .dish-price { color: var(--primary-dark); font-weight: 700; font-size: 15px; }
+  .dish-price small { font-weight: 400; color: var(--muted); font-size: 11px; margin-left: 4px; }
+  .dish-desc { font-size: 13px; color: var(--muted); margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* ===== 弹窗 ===== */
+  .modal-mask { position: fixed; inset: 0; background: rgba(60,40,10,.45); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+  .modal-mask.show { display: flex; }
+  .modal { background: var(--base-100); border-radius: 16px; width: 560px; max-width: 100%; max-height: 88vh; overflow-y: auto; padding: 24px 26px; }
+  .modal h3 { font-size: 19px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+  .modal-close { border: none; background: #f5f0e5; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; font-size: 15px; color: var(--muted); }
+  .modal-close:hover { background: #eee5d2; }
+  .sec-title { font-size: 14px; font-weight: 700; color: var(--primary-dark); margin: 18px 0 8px; padding-left: 8px; border-left: 3px solid var(--primary); }
+  table.mat-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .mat-table th { text-align: left; color: var(--muted); font-weight: 500; padding: 7px 8px; border-bottom: 1px solid #f0e8d5; }
+  .mat-table td { padding: 7px 8px; border-bottom: 1px dashed #f0e8d5; }
+  .mat-table .num { text-align: right; }
+  .steps-list { margin: 4px 0 0 20px; font-size: 14px; line-height: 1.9; }
+  .cost-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; background: var(--base-200); border-radius: 10px; padding: 10px 16px; }
+  .cost-bar b { color: var(--primary-dark); font-size: 19px; }
+
+  /* ===== 管理后台 ===== */
+  .admin-tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+  .admin-tab { padding: 8px 16px; border-radius: 10px 10px 0 0; background: var(--base-100); border: 1.5px solid #eadfc5; border-bottom: none; cursor: pointer; font-size: 14px; }
+  .admin-tab.active { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+  .panel { background: var(--base-100); border-radius: 0 var(--radius) var(--radius); box-shadow: var(--shadow); padding: 20px 22px; }
+  .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .panel-head h2 { font-size: 16px; }
+  table.data-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .data-table th { text-align: left; color: var(--muted); font-weight: 500; padding: 9px 8px; border-bottom: 2px solid #f0e8d5; }
+  .data-table td { padding: 9px 8px; border-bottom: 1px solid #f5efe0; }
+  .data-table tr:hover td { background: #fffdf6; }
+  .op { display: flex; gap: 6px; }
+
+  /* 材料动态行 */
+  .mat-row { display: grid; grid-template-columns: 1.6fr 90px 110px 24px; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .mat-row .del { border: none; background: none; color: var(--muted); font-size: 17px; cursor: pointer; }
+  .mat-row .del:hover { color: var(--danger); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+  .cost-preview { display: flex; align-items: baseline; gap: 18px; background: var(--base-200); border-radius: 10px; padding: 12px 16px; margin-top: 16px; }
+  .cost-preview .big { color: var(--primary-dark); font-size: 22px; font-weight: 700; }
+  .cost-preview .hint { font-size: 12px; color: var(--muted); }
+  .est-input { width: 110px; }
+  .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+  /* 登录页预览 */
+  .login-demo { display: none; }
+  .page { display: none; }
+  .page.show { display: block; }
+  .demo-note { position: fixed; bottom: 16px; right: 16px; background: var(--neutral); color: #fff; font-size: 12px; padding: 8px 14px; border-radius: 10px; opacity: .85; }
+</style>
+</head>
+<body>
+
+<!-- 导航栏 -->
+<nav class="navbar">
+  <div class="brand">🍳 我的菜单</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-page="menu">菜单</button>
+    <button class="nav-tab" data-page="manage">管理</button>
+  </div>
+  <div class="nav-right">
+    <span>admin</span>
+    <button class="btn btn-ghost btn-sm">退出</button>
+  </div>
+</nav>
+
+<!-- ===== 页面1：菜单展示 ===== -->
+<div class="page show" id="page-menu">
+  <div class="container">
+    <div class="cat-row">
+      <button class="cat-pill active">全部</button>
+      <button class="cat-pill">家常菜</button>
+      <button class="cat-pill">汤类</button>
+      <button class="cat-pill">甜点</button>
+      <button class="cat-pill">主食</button>
+      <input class="input search" placeholder="🔍 搜索菜名…">
+    </div>
+    <div class="dish-grid" id="dishGrid"></div>
+  </div>
+</div>
+
+<!-- ===== 页面2：管理后台 ===== -->
+<div class="page" id="page-manage">
+  <div class="container">
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="dishes">菜品管理</button>
+      <button class="admin-tab" data-tab="materials">材料管理</button>
+      <button class="admin-tab" data-tab="categories">分类管理</button>
+    </div>
+
+    <!-- 菜品管理 -->
+    <div class="panel" id="tab-dishes">
+      <div class="panel-head">
+        <h2>菜品列表</h2>
+        <button class="btn btn-primary btn-sm" onclick="openDishForm()">＋ 新增菜品</button>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>菜品</th><th>分类</th><th class="num">材料成本</th><th class="num">预估价</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr><td>番茄炒蛋</td><td><span class="badge">家常菜</span></td><td class="num">¥6.60</td><td class="num">¥8.00</td><td><div class="op"><button class="btn btn-outline btn-sm" onclick="openDishForm()">编辑</button><button class="btn btn-danger btn-sm">删除</button></div></td></tr>
+          <tr><td>紫菜蛋花汤</td><td><span class="badge">汤类</span></td><td class="num">¥3.20</td><td class="num">—</td><td><div class="op"><button class="btn btn-outline btn-sm" onclick="openDishForm()">编辑</button><button class="btn btn-danger btn-sm">删除</button></div></td></tr>
+          <tr><td>红烧肉</td><td><span class="badge">家常菜</span></td><td class="num">¥18.50</td><td class="num">¥25.00</td><td><div class="op"><button class="btn btn-outline btn-sm" onclick="openDishForm()">编辑</button><button class="btn btn-danger btn-sm">删除</button></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 材料管理 -->
+    <div class="panel" id="tab-materials" style="display:none">
+      <div class="panel-head">
+        <h2>材料库</h2>
+        <button class="btn btn-primary btn-sm">＋ 新增材料</button>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>材料名</th><th>单位</th><th class="num">单价 (元)</th><th>备注</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr><td>鸡蛋</td><td>个</td><td class="num">1.20</td><td></td><td><div class="op"><button class="btn btn-outline btn-sm">编辑</button><button class="btn btn-danger btn-sm">删除</button></div></td></tr>
+          <tr><td>番茄</td><td>g</td><td class="num">0.01</td><td>约10元/公斤</td><td><div class="op"><button class="btn btn-outline btn-sm">编辑</button><button class="btn btn-danger btn-sm">删除</button></div></td></tr>
+          <tr><td>五花肉</td><td>g</td><td class="num">0.037</td><td></td><td><div class="op"><button class="btn btn-outline btn-sm">编辑</button><button class="btn btn-danger btn-sm">删除</button></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 分类管理 -->
+    <div class="panel" id="tab-categories" style="display:none">
+      <div class="panel-head">
+        <h2>分类</h2>
+        <button class="btn btn-primary btn-sm">＋ 新增分类</button>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>分类名</th><th class="num">菜品数</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr><td>家常菜</td><td class="num">2</td><td><div class="op"><button class="btn btn-outline btn-sm">编辑</button><button class="btn btn-danger btn-sm">删除</button></div></td></tr>
+          <tr><td>汤类</td><td class="num">1</td><td><div class="op"><button class="btn btn-outline btn-sm">编辑</button><button class="btn btn-danger btn-sm">删除</button></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 弹窗：菜品详情 ===== -->
+<div class="modal-mask" id="detailModal" onclick="if(event.target===this) closeModal('detailModal')">
+  <div class="modal">
+    <h3><span>🍅 番茄炒蛋 <span class="badge">家常菜</span></span>
+        <button class="modal-close" onclick="closeModal('detailModal')">✕</button></h3>
+    <p style="color:var(--muted);font-size:13px">经典下饭菜，10 分钟搞定</p>
+    <div class="sec-title">所需材料</div>
+    <table class="mat-table">
+      <thead><tr><th>材料</th><th class="num">用量</th><th class="num">单价</th><th class="num">小计</th></tr></thead>
+      <tbody>
+        <tr><td>鸡蛋</td><td class="num">3 个</td><td class="num">¥1.20/个</td><td class="num">¥3.60</td></tr>
+        <tr><td>番茄</td><td class="num">300 g</td><td class="num">¥0.01/g</td><td class="num">¥3.00</td></tr>
+        <tr><td>食用油</td><td class="num">20 ml</td><td class="num">¥0.06/ml</td><td class="num">¥1.20</td></tr>
+      </tbody>
+    </table>
+    <div class="sec-title">制作流程</div>
+    <ol class="steps-list">
+      <li>鸡蛋加少许盐打散，番茄切滚刀块</li>
+      <li>热锅倒油，先炒鸡蛋至凝固盛出</li>
+      <li>下番茄炒出汁水，加糖和盐调味</li>
+      <li>倒回鸡蛋翻炒均匀即可出锅</li>
+    </ol>
+    <div class="cost-bar">
+      <span style="font-size:14px">预估花销 <small style="color:var(--muted)">（按材料单价自动计算）</small></span>
+      <b>¥ 7.80</b>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 弹窗：菜品编辑表单 ===== -->
+<div class="modal-mask" id="dishFormModal" onclick="if(event.target===this) closeModal('dishFormModal')">
+  <div class="modal" style="width:620px">
+    <h3><span>编辑菜品 / 新增菜品</span>
+        <button class="modal-close" onclick="closeModal('dishFormModal')">✕</button></h3>
+    <div class="form-grid">
+      <div>
+        <label class="label">菜品名称 *</label>
+        <input class="input" value="番茄炒蛋" placeholder="如：番茄炒蛋">
+      </div>
+      <div>
+        <label class="label">分类</label>
+        <select class="select"><option>家常菜</option><option>汤类</option><option>甜点</option><option>主食</option></select>
+      </div>
+    </div>
+    <label class="label">简介</label>
+    <input class="input" value="经典下饭菜，10 分钟搞定">
+    <label class="label">制作流程（每行一步）</label>
+    <textarea class="textarea" rows="4">鸡蛋加少许盐打散，番茄切滚刀块
+热锅倒油，先炒鸡蛋至凝固盛出
+下番茄炒出汁水，加糖和盐调味
+倒回鸡蛋翻炒均匀即可出锅</textarea>
+    <label class="label">图片链接（可选）</label>
+    <input class="input" placeholder="https://...">
+    <div class="sec-title">所需材料（单价 × 用量 = 自动算成本）</div>
+    <div id="matRows"></div>
+    <button class="btn btn-outline btn-sm" onclick="addMatRow()" style="margin-top:4px">＋ 添加材料</button>
+    <div class="cost-preview">
+      <span style="font-size:13px;color:var(--muted)">计算成本</span>
+      <span class="big" id="costPreview">¥ 7.80</span>
+      <span class="hint">改材料或数量即时更新</span>
+      <span style="margin-left:auto;font-size:13px;color:var(--muted)">手填预估价</span>
+      <input class="input est-input" type="number" step="0.5" placeholder="不填则用计算值" value="8">
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeModal('dishFormModal')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('dishFormModal')">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="demo-note">设计 Demo（静态假数据）· 细节确认后开发正式版</div>
+
+<script>
+// ===== 假数据 =====
+const dishes = [
+  { emoji:'🍅', name:'番茄炒蛋', cat:'家常菜', desc:'经典下饭菜，酸甜开胃，十分钟出锅。', price:'¥7.80', manual:'¥8.00' },
+  { emoji:'🍲', name:'紫菜蛋花汤', cat:'汤类', desc:'清爽快手汤，晚餐配菜首选。', price:'¥3.20' },
+  { emoji:'🥘', name:'红烧肉', cat:'家常菜', desc:'肥而不腻，入口即化的家常红烧肉。', price:'¥18.50', manual:'¥25.00' },
+  { emoji:'🍮', name:'焦糖布丁', cat:'甜点', desc:'丝滑焦糖，冷藏后口感更佳。', price:'¥5.40' },
+  { emoji:'🍚', name:'腊味煲仔饭', cat:'主食', desc:'锅巴焦香，腊肠油脂渗入米饭。', price:'¥12.00' },
+  { emoji:'🥟', name:'韭菜猪肉饺', cat:'主食', desc:'皮薄馅大，一次可以包两顿的量。', price:'¥9.60' },
+];
+
+const mockMaterials = [
+  { name:'鸡蛋', unit:'个', price:1.2 },
+  { name:'番茄', unit:'g', price:0.01 },
+  { name:'五花肉', unit:'g', price:0.037 },
+  { name:'食用油', unit:'ml', price:0.06 },
+  { name:'紫菜', unit:'g', price:0.08 },
+  { name:'淡奶油', unit:'ml', price:0.09 },
+];
+
+// 渲染卡片
+document.getElementById('dishGrid').innerHTML = dishes.map(d => `
+  <div class="dish-card" onclick="showModal('detailModal')">
+    <div class="dish-img">${d.emoji}</div>
+    <div class="dish-body">
+      <div class="dish-name"><span>${d.name}</span><span class="badge">${d.cat}</span></div>
+      <div class="dish-price">${d.manual ? d.manual + '<small>手填价</small>' : d.price + '<small>计算成本</small>'}</div>
+      <div class="dish-desc">${d.desc}</div>
+    </div>
+  </div>`).join('');
+
+// 动态材料行 + 实时成本
+function addMatRow() {
+  const opts = mockMaterials.map(m => `<option data-p="${m.price}">${m.name}（¥${m.price}/${m.unit}）</option>`).join('');
+  const row = document.createElement('div');
+  row.className = 'mat-row';
+  row.innerHTML = `
+    <select class="select" onchange="calcCost()">${opts}</select>
+    <input class="input" type="number" placeholder="用量" oninput="calcCost()">
+    <span class="hint" style="font-size:12px;color:var(--muted)">小计 ¥0.00</span>
+    <button class="del" onclick="this.parentElement.remove();calcCost()">✕</button>`;
+  document.getElementById('matRows').appendChild(row);
+}
+function calcCost() {
+  let total = 0;
+  document.querySelectorAll('.mat-row').forEach(r => {
+    const p = parseFloat(r.querySelector('select').selectedOptions[0]?.dataset.p || 0);
+    const q = parseFloat(r.querySelector('input').value || 0);
+    const sub = p * q;
+    r.children[2].textContent = `小计 ¥${sub.toFixed(2)}`;
+    total += sub;
+  });
+  document.getElementById('costPreview').textContent = `¥ ${total.toFixed(2)}`;
+}
+
+// 弹窗与页面切换
+function showModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function openDishForm() { showModal('dishFormModal'); document.getElementById('matRows').innerHTML = ''; addMatRow(); addMatRow(); calcCost(); }
+
+document.querySelectorAll('.nav-tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.nav-tab').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+  document.getElementById('page-' + t.dataset.page).classList.add('show');
+});
+document.querySelectorAll('.admin-tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.admin-tab').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  ['dishes','materials','categories'].forEach(k =>
+    document.getElementById('tab-' + k).style.display = k === t.dataset.tab ? '' : 'none');
+});
+document.querySelectorAll('.cat-pill').forEach(p => p.onclick = () => {
+  document.querySelectorAll('.cat-pill').forEach(x => x.classList.remove('active'));
+  p.classList.add('active');
+});
+</script>
+</body>
+</html>
