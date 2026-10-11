@@ -54,7 +54,7 @@ const steps = () => (detail.value?.steps || '').split('\n').filter(Boolean);
 
         <template v-if="steps().length">
           <h4 class="font-bold text-primary mt-4 mb-2 pl-2 border-l-4 border-primary">制作流程</h4>
-          <ol class="list-decimal ml-5 space-y-1 text-sm leading-relaxed">
+          <ol class="list-none space-y-1 text-sm leading-relaxed">
             <li v-for="(s, i) in steps()" :key="i">{{ s }}</li>
           </ol>
         </template>
